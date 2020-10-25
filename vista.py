@@ -11,7 +11,7 @@ import sys
 import transformations as tr
 import easy_shaders as es
 
-from modelo import Monoparado, Fondo, Monoagachado, Barra, BarraCreator, Fondobaja
+from modelo import Mono, Fondo, Barra, BarraCreator, Fondobaja
 from controller import Controller
 
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
 
     # Creamos los objetos
     fondo = Fondobaja()
-    monop = Monoparado()
-    monoa = Monoagachado()
+    mono = Mono()
+   
     def leer(estructura):
             with open(estructura) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',')
@@ -64,10 +64,9 @@ if __name__ == '__main__':
     r=leer("estructura.csv")
     barra = BarraCreator(r)
         
-    controlador.set_model(monop)
+    controlador.set_model(mono)
     controlador.set_barra(barra)
     controlador.set_fondo(fondo)
-
 
     
     t0=0
@@ -87,17 +86,20 @@ if __name__ == '__main__':
         ti = glfw.get_time()
         dt = ti - t0
         t0 = ti
-    
+       
         fondo.create_fondo()
         fondo.update(0.3 * dt)
         fondo.draw(texture)
+        
         barra.create_barra()  
         barra.update(0.5 * dt)
+
+        mono.jump(barra)
+        mono.draw(texture)
         
-        monop.draw(texture)
         barra.draw(color)
 
-
+     
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
 

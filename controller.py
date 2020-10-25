@@ -10,7 +10,7 @@ import easy_shaders as es
 
 class Controller(object):
 
-    model: Union['Monoparado', None]  # Con esto queremos decir que el tipo de modelo es 'Chansey' (nuestra clase) ó None
+    model: Union['Mono', None]  # Con esto queremos decir que el tipo de modelo es 'Chansey' (nuestra clase) ó None
     barra: Union['BarraCreator', None]
 
     def __init__(self):
@@ -27,8 +27,9 @@ class Controller(object):
 
     def set_fondo(self, f):
         self.fondo = f 
-        
+    
     def on_key(self, window, key, scancode, action, mods):
+        
         if not (action == glfw.PRESS or action == glfw.RELEASE):
             return
 
@@ -43,7 +44,7 @@ class Controller(object):
             self.model.move_right()
             
         if key == glfw.KEY_W and action == glfw.PRESS:
-            self.model.move_front()
+            self.model.update()
             
         
         

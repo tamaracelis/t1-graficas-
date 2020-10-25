@@ -56,14 +56,17 @@ class Fondobaja(object):
             k.update(dt)
 
 
-class Monoparado(object):
+class Mono(object):
 
     def __init__(self):
         monop = es.toGPUShape(bs.createTextureQuad("parado.png", 1, 1), GL_REPEAT, GL_LINEAR)
-        monopTransform= tr.matmul([tr.translate(0, -0.7, 0), tr.uniformScale(0.5)])
         self.model = monop
+        self.pos_x = 0
+        self.pos_y = -0.7
+        self.pos = -0.7
+        monopTransform= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
         self.tra = monopTransform
-        self.pos = 0
+        
         
 
     def draw(self, pipeline):
@@ -72,44 +75,34 @@ class Monoparado(object):
         pipeline.drawShape(self.model)
      
     def move_left(self):
-        if self.pos == 0:
-            self.tra= tr.matmul([tr.translate(-0.7, -0.7, 0), tr.uniformScale(0.5)])
-            self.pos = -1
-        if self.pos == 1:
-            self.tra= tr.matmul([tr.translate(0, -0.7, 0), tr.uniformScale(0.5)])
-            self.pos = 0
-                
+        if self.pos_x == 0:
+            self.pos_x = -0.7
+        elif self.pos_x == 0.7:
+            self.pos_x = 0   
+        self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
+                      
 
     def move_right(self):
-        if self.pos == 0:
-            self.tra = tr.matmul([tr.translate(0.7, -0.7, 0), tr.uniformScale(0.5)])
-            self.pos = 1
-        if self.pos == -1:
-            self.tra = tr.matmul([tr.translate(0, -0.7, 0), tr.uniformScale(0.5)])
-            self.pos = 0
+        if self.pos_x == 0:
+            self.pos_x = 0.7
+        elif self.pos_x == -0.7:
+            self.pos_x = 0
+        self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
+            
+    def update(self):
+        if self.pos_y<=0:
+            self.pos = self.pos_y
+            self.pos_y += 0.7
+            self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
+    
+    def jump(self, barra: 'BarraCreator'):
+        for b in barra.barra:
+            if b.pos_y <= self.pos_y and b.pos_y >= self.pos and b.pos_x == self.pos_x and b.pos_y>-0.7:
+                self.pos_y=b.pos_y
+                self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
+      
+                 
 
-    def move_front(self):
-        if self.pos==-1:
-            self.tra= tr.matmul([tr.translate(-0.7, -0.2 , 0), tr.uniformScale(0.5)])
-        if self.pos==0:
-            self.tra= tr.matmul([tr.translate(0, -0.2 , 0), tr.uniformScale(0.5)])
-        if self.pos==1:
-            self.tra= tr.matmul([tr.translate(0.7, -0.2, 0), tr.uniformScale(0.5)])
-        
-class Monoagachado(object):
-    def __init__(self):
-        monoa = es.toGPUShape(bs.createTextureQuad("agachado.png", 1, 1), GL_REPEAT, GL_LINEAR)
-        monoaTransform= tr.uniformScale(0.8)
-        self.model = monoa
-        self.tra = monoaTransform
-        
-       
-
-    def draw(self, pipeline):
-        glUseProgram(pipeline.shaderProgram)
-        glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "transform"), 1, GL_TRUE, self.tra)
-        pipeline.drawShape(self.model)
-        
 class Barra(object):
     def __init__(self, r):
         gpu_barra = es.toGPUShape(bs.createColorQuad(0.5, 0.5, 0.5))
@@ -122,18 +115,16 @@ class Barra(object):
         transform_barra1.childs += [barra]
 
         self.model = transform_barra1
-        self.posicion = 0
         self.pos_y = 1
-        self.pos_x=1
     
         if len(r)!=0:
             p=r.pop(0)
             if p[0]=="1":
-                self.pos_x=-1
+                self.pos_x=-0.7
             if p[2]=="1":
                 self.pos_x=0
             if p[4]=="1":
-                self.pos_x=1
+                self.pos_x=0.7
                 
         self.r=r
                 
@@ -142,11 +133,11 @@ class Barra(object):
         
 
     def draw(self, pipeline):  
-        self.model.transform = tr.translate(0.7 * self.pos_x, self.pos_y, 0)
+        self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
         sg.drawSceneGraphNode(self.model, pipeline, "transform")
 
 class BarraCreator(object):
-    barra: List['barra']
+    barra: List['Barra']
     def __init__(self,r):
         self.barra = [Barra(r)]
         self.count=0
