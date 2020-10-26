@@ -90,15 +90,15 @@ class Mono(object):
         self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
             
     def update(self):
-        if self.pos_y<=0:
+        if self.pos_y<=0.5:
             self.pos = self.pos_y
-            self.pos_y += 0.7
+            self.pos_y += 0.5
             self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
     
     def jump(self, barra: 'BarraCreator'):
         for b in barra.barra:
-            if b.pos_y <= self.pos_y and b.pos_y >= self.pos and b.pos_x == self.pos_x and b.pos_y>-0.7:
-                self.pos_y=b.pos_y
+            if b.pos_y <= self.pos_y  and b.pos_y >= self.pos and b.pos_x == self.pos_x and b.pos_y>-2:
+                self.pos_y=b.pos_y+0.28
                 self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
       
                  
@@ -108,7 +108,7 @@ class Barra(object):
         gpu_barra = es.toGPUShape(bs.createColorQuad(0.5, 0.5, 0.5))
         
         barra = sg.SceneGraphNode('barra')
-        barra.transform = tr.matmul([tr.scale(0.7,0.1, 1), tr.translate(0, 10, 0)])
+        barra.transform = tr.matmul([tr.scale(0.7,0.1, 1), tr.translate(0, 0, 0)])
         barra.childs += [gpu_barra]
 
         transform_barra1 = sg.SceneGraphNode('chanseyTR')

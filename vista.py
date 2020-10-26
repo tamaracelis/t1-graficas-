@@ -92,13 +92,13 @@ if __name__ == '__main__':
         fondo.draw(texture)
         
         barra.create_barra()  
-        barra.update(0.5 * dt)
+        barra.update(0.4 * dt)
 
         mono.jump(barra)
         mono.draw(texture)
         
         barra.draw(color)
-
+        
      
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
