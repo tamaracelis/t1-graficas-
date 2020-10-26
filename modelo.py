@@ -55,7 +55,6 @@ class Fondobaja(object):
         for k in self.fondo:
             k.update(dt)
 
-
 class Mono(object):
 
     def __init__(self):
@@ -89,15 +88,17 @@ class Mono(object):
         self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
             
     def update(self):
-        if self.pos_y<=0.5:
+        if self.pos_y<0:
             self.pos_y += 0.5
             self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
     
     def jump(self, barra: 'BarraCreator'):
         for b in barra.barra:
-            if b.pos_y <= self.pos_y  and b.pos_x == self.pos_x and b.pos_y>-1.3:
+            if b.pos_y <= self.pos_y  and b.pos_x == self.pos_x and b.pos_y>-1 :
                 self.pos_y=b.pos_y+0.28
                 self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
+            if len(b.r)==0:
+                print("termino")
       
                  
 class Barra(object):
