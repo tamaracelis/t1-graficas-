@@ -63,7 +63,6 @@ class Mono(object):
         self.model = monop
         self.pos_x = 0
         self.pos_y = -0.7
-        self.pos = -0.7
         monopTransform= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
         self.tra = monopTransform
         
@@ -91,18 +90,16 @@ class Mono(object):
             
     def update(self):
         if self.pos_y<=0.5:
-            self.pos = self.pos_y
             self.pos_y += 0.5
             self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
     
     def jump(self, barra: 'BarraCreator'):
         for b in barra.barra:
-            if b.pos_y <= self.pos_y  and b.pos_y >= self.pos and b.pos_x == self.pos_x and b.pos_y>-2:
+            if b.pos_y <= self.pos_y  and b.pos_x == self.pos_x and b.pos_y>-1.3:
                 self.pos_y=b.pos_y+0.28
                 self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
       
                  
-
 class Barra(object):
     def __init__(self, r):
         gpu_barra = es.toGPUShape(bs.createColorQuad(0.5, 0.5, 0.5))
