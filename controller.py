@@ -10,9 +10,6 @@ import easy_shaders as es
 
 class Controller(object):
 
-    model: Union['Mono', None]  # Con esto queremos decir que el tipo de modelo es 'Chansey' (nuestra clase) ó None
-    barra: Union['BarraCreator', None]
-
     def __init__(self):
         self.model = None
         self.barra = None
@@ -37,12 +34,16 @@ class Controller(object):
             sys.exit()
 
         # Controlador modifica al modelo
+        
+        #si se presiona la A el modelo se mueve a la izquierda
         if key == glfw.KEY_A and action == glfw.PRESS:
             self.model.move_left()
-
+        
+        #si se presiona la D el modelo se mueve a la derecha
         if key == glfw.KEY_D and action == glfw.PRESS:
             self.model.move_right()
             
+        #si se presiona la W el modelo salta 
         if key == glfw.KEY_W and action == glfw.PRESS:
             self.model.update()
             
