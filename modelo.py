@@ -11,6 +11,7 @@ from OpenGL.GL import *
 import csv
 import random
 from typing import List
+import easy_shaders as es
 
 class Fondo(object):
 
@@ -38,7 +39,7 @@ class Fondobaja(object):
         self.fondo = [Fondo(0, 1),Fondo(2, -1)]
         self.count=1
         
-    def create_fondo(self):
+    def create_fondo(self):     
         if self.fondo[self.count].pos<=0:
             if self.count%2==0:
                 self.fondo.append(Fondo(2,-1))
@@ -55,18 +56,23 @@ class Fondobaja(object):
         for k in self.fondo:
             k.update(dt)
 
+        
 class Mono(object):
 
-    def __init__(self):
-        monop = es.toGPUShape(bs.createTextureQuad("parado.png", 1, 1), GL_REPEAT, GL_LINEAR)
+    def __init__(self, texture):
+        self.texture = texture
+        monop = es.toGPUShape(bs.createTextureQuad(self.texture, 1, 1), GL_REPEAT, GL_LINEAR)
         self.model = monop
         self.pos_x = 0
         self.pos_y = -0.7
+        self.pos=-0.7
         monopTransform= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
         self.tra = monopTransform
+        self.winner = False 
+        self.loser = False 
         
+    
         
-
     def draw(self, pipeline):
         glUseProgram(pipeline.shaderProgram)
         glUniformMatrix4fv(glGetUniformLocation(pipeline.shaderProgram, "transform"), 1, GL_TRUE, self.tra)
@@ -88,19 +94,26 @@ class Mono(object):
         self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
             
     def update(self):
-        if self.pos_y<0:
-            self.pos_y += 0.5
+        if self.pos_y<0.4:
+            self.pos=self.pos_y
+            self.pos_y += 0.6
             self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
     
-    def jump(self, barra: 'BarraCreator'):
-        for b in barra.barra:
-            if b.pos_y <= self.pos_y  and b.pos_x == self.pos_x and b.pos_y>-1 :
-                self.pos_y=b.pos_y+0.28
+    def jump(self, barra: 'BarraCreator'):  
+        for b in barra.copy:
+            if b.pos_y <= self.pos_y  and b.pos_x == self.pos_x and b.pos_y>-1.1 and self.pos>=b.pos_y-0.27 :
+                self.pos_y=b.pos_y+0.278
                 self.tra= tr.matmul([tr.translate(self.pos_x, self.pos_y, 0), tr.uniformScale(0.5)])
-            if len(b.r)==0:
-                print("termino")
-      
-                 
+                if self.pos_y<-0.7 and len(barra.copy)>1:
+                    self.loser=True
+                    return
+            
+            if b.pos_y<=-0.98 :
+                barra.copy.remove(b)
+                
+            if len(barra.copy)==0 :
+                self.winner = True
+        
 class Barra(object):
     def __init__(self, r):
         gpu_barra = es.toGPUShape(bs.createColorQuad(0.5, 0.5, 0.5))
@@ -109,7 +122,7 @@ class Barra(object):
         barra.transform = tr.matmul([tr.scale(0.7,0.1, 1), tr.translate(0, 0, 0)])
         barra.childs += [gpu_barra]
 
-        transform_barra1 = sg.SceneGraphNode('chanseyTR')
+        transform_barra1 = sg.SceneGraphNode('barraTR')
         transform_barra1.childs += [barra]
 
         self.model = transform_barra1
@@ -136,15 +149,21 @@ class Barra(object):
 
 class BarraCreator(object):
     barra: List['Barra']
-    def __init__(self,r):
+    def __init__(self,r, mono):
         self.barra = [Barra(r)]
-        self.count=0
+        self.count = 0
+        self.copy = self.barra[:]
+        self.mono=mono
         
     def create_barra(self):
-        if self.barra[self.count].pos_y<=0.3 and len(self.barra[self.count].r)>0:
+        if self.mono.loser:
+            return 
+        elif self.barra[self.count].pos_y<=0.3 and len(self.barra[self.count].r)>0:
             self.barra.append(Barra(self.barra[self.count].r))
+            self.copy=self.barra[:]
             self.count+=1
             
+         
             
     def draw(self, pipeline):
         for k in self.barra:

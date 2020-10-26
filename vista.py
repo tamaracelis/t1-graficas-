@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
     # Creamos los objetos
     fondo = Fondobaja()
-    mono = Mono()
+    mono = Mono("parado.png")
    
     def leer(estructura):
             with open(estructura) as csv_file:
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                     r.append(row[0])
                 return r
     r=leer("estructura.csv")
-    barra = BarraCreator(r)
+    barra = BarraCreator(r, mono)
         
     controlador.set_model(mono)
     controlador.set_barra(barra)
@@ -98,8 +98,18 @@ if __name__ == '__main__':
         mono.draw(texture)
         
         barra.draw(color)
+        if mono.loser:
+            mono=Mono("gameover.png")
+            mono.loser=True
+            monoTransform=  tr.uniformScale(1.7)
+            mono.tra = monoTransform
+        elif mono.winner and  not mono.loser:
+            mono=Mono("victory2.png")
+            monoTransform=  tr.uniformScale(1.7)
+            mono.tra = monoTransform
+            
         
-     
+
         # Once the drawing is rendered, buffers are swap so an uncomplete drawing is never seen.
         glfw.swap_buffers(window)
 
